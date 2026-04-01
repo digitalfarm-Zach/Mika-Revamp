@@ -259,26 +259,29 @@
 
         /* Hero Section */
         .hero {
-            height: 100svh;
-            display: flex;
-            align-items: center;
-            padding: 0 5vw;
-            overflow: hidden;
-            position: relative;
-            background: var(--color-void);
+          position: relative;          /* MUST be set for ::before and absolute children to stack correctly */
+          min-height: 100svh;
+          height: auto;                 /* grows if content is taller than viewport */
+          display: flex;
+          align-items: flex-start;
+          padding: 0 5vw;
+          padding-bottom: 5rem;         /* breathing room above marquee */
+          overflow: hidden;
+          background: var(--color-void);
         }
 
         .hero-bg {
-            position: absolute;
-            inset: 0;
-            background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1800&q=80');
-            background-size: cover;
-            background-position: center 40%;
-            opacity: 0.45;
-            filter: saturate(0.8) contrast(1.1);
-            transform: scale(1.05);
-            transition: transform 8s ease;
-            z-index: 0;
+          position: absolute;
+          inset: 0;
+          min-height: 100%;             /* stretches with hero if it grows */
+          background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1800&q=80');
+          background-size: cover;
+          background-position: center 40%;
+          opacity: 0.45;
+          filter: saturate(0.8) contrast(1.1);
+          transform: scale(1.05);
+          transition: transform 8s ease;
+          z-index: 0;                  /* layer 0: image, furthest back */
         }
 
         /* Slow Ken Burns zoom on load */
@@ -287,29 +290,29 @@
         }
 
         .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                to right,
-                rgba(10,9,8,0.82) 0%,
-                rgba(10,9,8,0.55) 50%,
-                rgba(10,9,8,0.2) 100%
-            );
-            z-index: 1;
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to bottom, rgba(10,9,8,0.2) 0%, rgba(10,9,8,0.8) 100%),
+                      linear-gradient(to right, rgba(10,9,8,0.9) 0%, rgba(10,9,8,0.4) 50%, transparent 100%);
+          z-index: 1;                  /* layer 1: overlay, on top of image */
+          pointer-events: none;
         }
 
+        /* All hero content must be above the overlay */
         .hero-content {
-            max-width: 900px;
-            position: relative;
-            z-index: 2;
+          position: relative;
+          z-index: 2;                  /* layer 2: text content, on top of overlay */
+          max-width: min(900px, 90vw);
+          width: 100%;
+          padding-top: clamp(4rem, 8vh, 7rem);   /* reduced ceiling */
         }
 
         .hero-headline {
-            font-size: clamp(5rem, 12vw, 11rem);
-            line-height: 0.9;
+            font-size: clamp(3.8rem, 8vw, 8rem);
+            line-height: 0.92;
             letter-spacing: -0.02em;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .hero-headline span {
@@ -347,7 +350,8 @@
             align-items: center;
             opacity: 0;
             transform: translateY(20px);
-            transition: all 1s ease 1s;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s;
+            margin-top: 2rem;
         }
 
         .hero-ctas.active {
@@ -391,15 +395,15 @@
         }
 
         .hero-side {
-            position: absolute;
-            right: 5vw;
-            top: 50%;
-            transform: translateY(-50%);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-            z-index: 2;
+          position: absolute;
+          z-index: 2;
+          right: 5vw;
+          top: 50%;
+          transform: translateY(-50%);
+          display: none;
+          flex-direction: column;
+          align-items: center;
+          gap: 2rem;
         }
 
         @media (min-width: 1024px) {
@@ -422,17 +426,18 @@
         }
 
         .hero-awards {
-            position: absolute;
-            bottom: 3rem;
-            left: 5vw;
+            position: static;
             display: flex;
-            gap: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.5rem;
             font-size: 0.65rem;
             letter-spacing: 0.15em;
             color: var(--color-ash);
             text-transform: uppercase;
+            margin-bottom: 2rem;
             opacity: 0;
-            transition: opacity 1s ease 1.5s;
+            transform: translateY(10px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s;
             z-index: 2;
         }
 
@@ -442,19 +447,47 @@
 
         .hero-awards.active {
             opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-height: 800px) {
+          .hero-headline {
+            font-size: clamp(3rem, 7vw, 6.5rem);
+            line-height: 0.95;
+            margin-bottom: 1rem;
+          }
+          .hero-body {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+          }
+          .hero-awards {
+            margin-bottom: 1.2rem;
+          }
+          .hero-ctas {
+            margin-top: 1.2rem;
+          }
+        }
+
+        @media (max-height: 650px) {
+          .hero-headline {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+          }
+          .hero-content {
+            padding-top: 4rem;
+          }
         }
 
         .scroll-indicator {
-            position: absolute;
-            bottom: 2.5rem;
-            right: 5vw;
-            left: auto;
-            transform: none;
-            width: 2px;
-            height: 60px;
-            background: rgba(200, 169, 126, 0.2);
-            overflow: hidden;
-            z-index: 2;
+          position: absolute;
+          z-index: 2;
+          bottom: 4.5rem;
+          left: 46%;
+          transform: translateX(-50%);
+          width: 2px;
+          height: 60px;
+          background: rgba(200, 169, 126, 0.2);
+          overflow: hidden;
+          pointer-events: none;
         }
 
         .scroll-indicator::after {
@@ -474,15 +507,21 @@
         }
 
         /* Marquee */
+        .marquee-wrapper {
+          position: relative;
+          z-index: 10;
+          margin-top: -72px;           /* Pulls the marquee up to overlap the hero bottom */
+          overflow: hidden;
+          padding: 24px 0;             /* Space for the skew to not be clipped */
+        }
+
         .marquee-container {
-            background: var(--color-ember);
-            height: 48px;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            transform: skewY(-1deg);
-            z-index: 5;
-            position: relative;
+          background: var(--color-ember);
+          height: 48px;
+          display: flex;
+          align-items: center;
+          transform: skewY(-1deg);
+          width: 100%;
         }
 
         .marquee-content {
@@ -506,8 +545,8 @@
         }
 
         @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-25%); }
         }
 
         /* Story Section */
@@ -612,8 +651,9 @@
             border: 1px solid var(--color-ember);
             padding: 2rem;
             opacity: 0;
-            transform: translateX(40px);
-            transition: all 1s var(--transition-smooth);
+            --parallax-y: 0px;
+            transform: translateX(40px) translateY(var(--parallax-y));
+            transition: opacity 1s var(--transition-smooth), transform 1s var(--transition-smooth);
         }
 
         @media (min-width: 1024px) {
@@ -631,7 +671,7 @@
 
         .story-image-frame.reveal {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateX(0) translateY(var(--parallax-y));
         }
 
         .story-image-placeholder {
@@ -1217,6 +1257,20 @@
             padding-bottom: 0;
         }
 
+        @media (max-height: 700px) {
+          .hero-headline {
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 0.95;
+          }
+          .hero-content {
+            padding-top: 5rem;
+          }
+          .hero-body {
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+          }
+        }
+
         /* ── 320px–480px (small phones) ── */
         @media (max-width: 480px) {
           .hero-headline {
@@ -1415,15 +1469,6 @@
           z-index: 2;
         }
 
-        /* ── Scroll indicator repositioned ── */
-        .scroll-indicator {
-          position: absolute;
-          bottom: 2.5rem;
-          right: 5vw;
-          left: auto;
-          transform: none;
-        }
-
         /* ── Hero awards hidden on small screens ── */
         @media (max-width: 767px) {
           .hero-awards {
@@ -1530,6 +1575,13 @@
                 <span class="line-3">Vita.</span>
             </h1>
             <p class="hero-body" id="hero-body">Modern Mediterranean fine dining, where two coastlines meet.</p>
+            <div class="hero-awards" id="hero-awards">
+                <span>⟡ Michelin Bib Gourmand</span>
+                <span>·</span>
+                <span>⟡ Michelin Service Award</span>
+                <span>·</span>
+                <span>⟡ TOADRA Winner 2025</span>
+            </div>
             <div class="hero-ctas" id="hero-ctas">
                 <a href="#reserve" class="btn-primary">Reserve a Table</a>
                 <a href="#about" class="btn-text"><span>↓</span> Explore</a>
@@ -1539,47 +1591,63 @@
             <span class="hero-side-text">Michelin Bib Gourmand · 2026</span>
             <div class="hero-side-line"></div>
         </div>
-        <div class="hero-awards" id="hero-awards">
-            <span>⟡ Michelin Bib Gourmand</span>
-            <span>·</span>
-            <span>⟡ Michelin Service Award</span>
-            <span>·</span>
-            <span>⟡ TOADRA Winner 2025</span>
-        </div>
         <div class="scroll-indicator"></div>
     </section>
 
-    <div style="overflow: hidden; padding: 24px 0;">
-        <div class="marquee-container">
+    <div class="marquee-wrapper">
+      <div class="marquee-container">
         <div class="marquee-content">
-            <div class="marquee-item">Modern Mediterranean</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">Yas Marina</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">Fine Dining</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">La Dolce Vita</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">Michelin Recognised</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">Abu Dhabi</div>
-            <div class="marquee-item">·</div>
-            <!-- Repeat for seamless loop -->
-            <div class="marquee-item">Modern Mediterranean</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">Yas Marina</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">Fine Dining</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">La Dolce Vita</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">Michelin Recognised</div>
-            <div class="marquee-item">·</div>
-            <div class="marquee-item">Abu Dhabi</div>
-            <div class="marquee-item">·</div>
+          <span class="marquee-item">Modern Mediterranean</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Yas Marina</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Fine Dining</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">La Dolce Vita</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Michelin Recognised</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Abu Dhabi</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Modern Mediterranean</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Yas Marina</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Fine Dining</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">La Dolce Vita</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Michelin Recognised</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Abu Dhabi</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Modern Mediterranean</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Yas Marina</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Fine Dining</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">La Dolce Vita</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Michelin Recognised</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Abu Dhabi</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Modern Mediterranean</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Yas Marina</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Fine Dining</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">La Dolce Vita</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Michelin Recognised</span>
+          <span class="marquee-item">·</span>
+          <span class="marquee-item">Abu Dhabi</span>
+          <span class="marquee-item">·</span>
         </div>
+      </div>
     </div>
-</div>
 
     <section id="about">
         <div class="container">
@@ -1827,15 +1895,38 @@
         });
 
         // Hero Animations
-        window.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('.hero-bg').classList.add('loaded');
-            setTimeout(() => {
-                document.getElementById('hero-headline').classList.add('active');
-                document.getElementById('hero-body').classList.add('active');
-                document.getElementById('hero-ctas').classList.add('active');
-                document.getElementById('hero-awards').classList.add('active');
-            }, 300);
-        });
+        function initHeroAnimations() {
+            const headline = document.getElementById('hero-headline');
+            const body = document.getElementById('hero-body');
+            const ctas = document.getElementById('hero-ctas');
+            const awards = document.getElementById('hero-awards');
+            const heroBg = document.querySelector('.hero-bg');
+            
+            if (headline) headline.classList.add('active');
+            if (body) body.classList.add('active');
+            if (ctas) ctas.classList.add('active');
+            if (awards) awards.classList.add('active');
+            if (heroBg) heroBg.classList.add('loaded');
+
+            const overline = document.querySelector('.hero-content .overline');
+            if (overline) {
+                overline.style.opacity = '0';
+                overline.style.transform = 'translateY(10px)';
+                overline.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s';
+                setTimeout(() => {
+                    overline.style.opacity = '1';
+                    overline.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(initHeroAnimations, 300);
+            });
+        } else {
+            setTimeout(initHeroAnimations, 300);
+        }
 
         // Scroll Logic
         const nav = document.getElementById('main-nav');
@@ -1910,10 +2001,10 @@
         // Parallax Art Frame
         const parallaxFrame = document.getElementById('parallax-frame');
         window.addEventListener('scroll', () => {
-            if (window.innerWidth > 1024) {
+            if (window.innerWidth > 1024 && parallaxFrame) {
                 const scrolled = window.pageYOffset;
                 const rate = scrolled * 0.05;
-                parallaxFrame.style.transform = `translateY(${rate}px)`;
+                parallaxFrame.style.setProperty('--parallax-y', `${rate}px`);
             }
         });
 
